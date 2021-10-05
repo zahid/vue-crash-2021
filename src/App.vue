@@ -28,50 +28,67 @@ export default {
     toggleAddTask() {
       this.showAddTask = !this.showAddTask;
     },
-    addTask(task) {
-      this.tasks = [...this.tasks, task];
+    async addTask(task) {
+      const response = await fetch(`api/tasks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(task)
+      });
+      const data = await response.json();
+      this.tasks = [...this.tasks, data];
     },
-    deleteTask(id) {
-      if (confirm("Are you sure?")) {
+    async deleteTask(id) {
+      if (!confirm("Are you sure?")) {
+        return; 
+      }
+
+      const response = await fetch(`api/tasks/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.status === 200) {
         this.tasks = this.tasks.filter(item => item.id !== id);
+      } else {
+        alert('Error deleting task');
       }
     },
-    toggleReminder(id) {
+    async toggleReminder(id) {
+      const taskToToggle = await this.fetchTask(id);
+      const updatedTask = {...taskToToggle, reminder: !taskToToggle.reminder};
+
+      const response = await fetch(`api/tasks/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedTask)
+      });
+
+      const data = response.json();
+
+
       this.tasks = this.tasks.map(task =>
-        task.id == id ? { ...task, reminder: !task.reminder } : task
+        task.id == id ? { ...task, reminder: data.reminder } : task
       );
-    }
+    },
+    async fetchTasks() {
+      const response = await fetch('api/tasks');
+      const data = await response.json();
+      return data;
+    },
+    async fetchTask(id) {
+      const response = await fetch(`api/tasks/${id}`);
+      const data = await response.json();
+      return data;
+    },
   },
   data() {
     return { tasks: [], showAddTask: false };
   },
-  created() {
-    this.tasks = [
-      {
-        id: 1,
-        text: "Pick up groceries",
-        day: "October 4, 2021 at 3:00pm",
-        reminder: true
-      },
-      {
-        id: 2,
-        text: "Meeting with Business",
-        day: "October 5, 2021 at 1:00pm",
-        reminder: true
-      },
-      {
-        id: 3,
-        text: "Call Doctor",
-        day: "October 6, 2021 at 9:00am",
-        reminder: true
-      },
-      {
-        id: 4,
-        text: "Change car oil",
-        day: "October 9, 2021 at 8:00am",
-        reminder: false
-      }
-    ];
+  async created() {
+    this.tasks = await this.fetchTasks();
   }
 };
 </script>

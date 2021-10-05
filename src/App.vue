@@ -1,7 +1,13 @@
 <template>
   <div class="container">
-    <Header title="Task Tracker" />
-    <AddTask v-on:add-task="addTask" />
+    <Header
+      title="Task Tracker"
+      v-bind:showAddTask="showAddTask"
+      v-on:toggle-add-task="toggleAddTask"
+    />
+    <div v-if="showAddTask">
+      <AddTask v-on:add-task="addTask" />
+    </div>
     <Tasks
       v-on:toggle-reminder="toggleReminder"
       v-on:delete-task="deleteTask"
@@ -19,6 +25,9 @@ export default {
   name: "App",
   components: { Header, Tasks, AddTask },
   methods: {
+    toggleAddTask() {
+      this.showAddTask = !this.showAddTask;
+    },
     addTask(task) {
       this.tasks = [...this.tasks, task];
     },
@@ -34,7 +43,7 @@ export default {
     }
   },
   data() {
-    return { tasks: [] };
+    return { tasks: [], showAddTask: false };
   },
   created() {
     this.tasks = [

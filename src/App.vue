@@ -5,92 +5,27 @@
       v-bind:showAddTask="showAddTask"
       v-on:toggle-add-task="toggleAddTask"
     />
-    <div v-if="showAddTask">
-      <AddTask v-on:add-task="addTask" />
-    </div>
-    <Tasks
-      v-on:toggle-reminder="toggleReminder"
-      v-on:delete-task="deleteTask"
-      v-bind:tasks="tasks"
-    />
+    <router-view v-bind:showAddTask="showAddTask"></router-view>
     <Footer />
   </div>
 </template>
 
 <script>
-import Tasks from "./components/Tasks";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import AddTask from "./components/AddTask";
 
 export default {
   name: "App",
-  components: { Header, Footer, Tasks, AddTask },
+  components: { Header, Footer },
+  data() {
+    return {
+      showAddTask: false,
+    };
+  },
   methods: {
     toggleAddTask() {
       this.showAddTask = !this.showAddTask;
-    },
-    async addTask(task) {
-      const response = await fetch(`api/tasks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(task)
-      });
-      const data = await response.json();
-      this.tasks = [...this.tasks, data];
-    },
-    async deleteTask(id) {
-      if (!confirm("Are you sure?")) {
-        return; 
-      }
-
-      const response = await fetch(`api/tasks/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (response.status === 200) {
-        this.tasks = this.tasks.filter(item => item.id !== id);
-      } else {
-        alert('Error deleting task');
-      }
-    },
-    async toggleReminder(id) {
-      const taskToToggle = await this.fetchTask(id);
-      const updatedTask = {...taskToToggle, reminder: !taskToToggle.reminder};
-
-      const response = await fetch(`api/tasks/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedTask)
-      });
-
-      if (response.status === 200) {
-        this.tasks = this.tasks = await this.fetchTasks();
-      } else {
-        alert('Error updating task');
-      }
-      
-    },
-    async fetchTasks() {
-      const response = await fetch('api/tasks');
-      const data = await response.json();
-      return data;
-    },
-    async fetchTask(id) {
-      const response = await fetch(`api/tasks/${id}`);
-      const data = await response.json();
-      return data;
-    },
-  },
-  data() {
-    return { tasks: [], showAddTask: false };
-  },
-  async created() {
-    this.tasks = await this.fetchTasks();
+    }
   }
 };
 </script>

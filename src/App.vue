@@ -13,17 +13,19 @@
       v-on:delete-task="deleteTask"
       v-bind:tasks="tasks"
     />
+    <Footer />
   </div>
 </template>
 
 <script>
 import Tasks from "./components/Tasks";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import AddTask from "./components/AddTask";
 
 export default {
   name: "App",
-  components: { Header, Tasks, AddTask },
+  components: { Header, Footer, Tasks, AddTask },
   methods: {
     toggleAddTask() {
       this.showAddTask = !this.showAddTask;
@@ -66,12 +68,12 @@ export default {
         body: JSON.stringify(updatedTask)
       });
 
-      const data = response.json();
-
-
-      this.tasks = this.tasks.map(task =>
-        task.id == id ? { ...task, reminder: data.reminder } : task
-      );
+      if (response.status === 200) {
+        this.tasks = this.tasks = await this.fetchTasks();
+      } else {
+        alert('Error updating task');
+      }
+      
     },
     async fetchTasks() {
       const response = await fetch('api/tasks');

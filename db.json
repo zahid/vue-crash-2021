@@ -10,13 +10,19 @@
       "id": "3",
       "text": "Food shopping",
       "day": "March 7th at 2:00pm",
-      "reminder": false
+      "reminder": true
     },
     {
       "id": "4",
       "text": "Go to dentist",
       "day": "Nov 10th at 3:00pm",
-      "reminder": false
+      "reminder": true
+    },
+    {
+      "text": "Walk the neighbor's dog",
+      "day": "Tomorrow at 5:00pm",
+      "reminder": true,
+      "id": "BQ1I1Zz"
     }
   ]
 }
